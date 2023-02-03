@@ -1,0 +1,115 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+
+    <div class="row my-4">
+        <div class="col-sm-6">
+            <h1 class="m-0 text-dark">Mes tâches</h1>
+        </div>
+        <div class="col-sm-6">
+            <a href="{{ path('app_todo_create') }}" type="button" class="btn btn-outline-primary float-right">
+                <i class="fa fa-plus"></i> Ajouter une tâche
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <style>
+                .table td {
+                    vertical-align: middle;
+                }
+                .todo-photo {
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                }
+            </style>
+            {% if msg %}
+                <div class="alert alert-{{ msg.status }} alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    {{ msg.text }}
+                </div>
+            {% endif %}
+            <table id="todos" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Statut</th>
+                        <th>Date de fin</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for todo in todos %}
+                        <tr class="todo-row-{{todo.id}}">
+                            <td class="title">
+                                <div class="row">
+                                    {% if todo.photoSrc %}
+                                    <div class="mr-2">
+                                        <img class="todo-photo" src="{{ asset('uploads/todo/' ~ todo.photoSrc) }}" alt="Todo Image" >
+                                    </div>
+                                    {% endif %}
+                                    <div>
+                                        <div>{{ todo.title }}<div>
+                                        <div><small>{{ todo.description }}<small><div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="status">
+                                {% if todo.status == 'pending' %}
+                                    <span class="badge bg-success">To do</span>
+                                {% endif %}
+                                {% if todo.status == 'inprogress' %}
+                                    <span class="badge bg-danger">In progress</span>
+                                {% endif %}
+                                {% if todo.status == 'completed' %}
+                                    <span class="badge bg-info">Completed</span>
+                                {% endif %}
+                            </td>
+                            
+                            <td class="end_date">{{ todo.endDate | date('d/m/Y') }}</td>
+                            <td>
+                                <a href="{{ path('app_todo_edit', {id: todo.id}) }}" class="fas fa-edit mr-2"></a>
+                                <a href="javascript: void(0)" class="fas fa-trash btn-delete" data-url="{{ path('app_todo_delete', {todo: todo.id}) }}"></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal fade" id="modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Confirm</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure to delete this item?</p>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary modal-confirm">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+{% endblock %}
+
+{% block script %}
+    <script>
+        var seletedItemUrl = null;
+        $('.btn-delete').click(function() {
+            $('#modal').modal();
+            seletedItemUrl = $(this).data('url');
+        })
+        $('.modal-confirm').click(function() {
+            window.location.assign(seletedItemUrl);
+        })
+    </script>
+{% endblock %}
